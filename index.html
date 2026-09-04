@@ -441,16 +441,24 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     const rect = wrap.getBoundingClientRect();
     const svg = document.getElementById('lines');
     const anchors = { 0:[59,47], 1:[80,28], 2:[35,63], 3:[49,87], 4:[93,89] };
-    const tagPos  = { 0:[22,1], 1:[96,-5], 2:[-19,24], 3:[5,105], 4:[101,108] };
+    const tagEls = Array.from(document.querySelectorAll('#pageMore .tag'));
     svg.innerHTML = '';
     svg.setAttribute('width', rect.width);
     svg.setAttribute('height', rect.height);
     drawnPolylines.length = 0;
-    Object.keys(anchors).forEach(k=>{
-      const [ax,ay]=anchors[k], [tx,ty]=tagPos[k];
-      const labelX = rect.width*(tx/100) + (tx<50?60:0);
-      const labelY = rect.height*(ty/100) + 8;
+    Object.keys(anchors).forEach((k, idx)=>{
+      const [ax,ay]=anchors[k];
       const anchorX = rect.width*(ax/100), anchorY = rect.height*(ay/100);
+      const tag = tagEls[idx];
+      // measure the label's REAL rendered box (not a guessed formula) and
+      // attach the line to whichever point on its edge sits closest to the
+      // anchor, so it always touches the text exactly, from any direction
+      const tr = tag.getBoundingClientRect();
+      const tLeft = tr.left - rect.left, tRight = tr.right - rect.left;
+      const tTop = tr.top - rect.top, tBottom = tr.bottom - rect.top;
+      const pad = 5;
+      const labelX = Math.min(Math.max(anchorX, tLeft - pad), tRight + pad);
+      const labelY = Math.min(Math.max(anchorY, tTop - pad), tBottom + pad);
       // bent connector: diagonal segment near the label, then a short
       // horizontal segment approaching the anchor point (no straight lines)
       const bendX = labelX + (anchorX - labelX) * 0.55;
@@ -481,6 +489,13 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     });
   }
   window.addEventListener('resize', drawLines);
+  // the label text uses a custom webfont that can still be loading when
+  // drawLines() first measures it (60ms into the reveal) — once it swaps
+  // in, box widths shift and the old line endpoints go stale. Redraw once
+  // fonts are confirmed ready to snap every line back onto its label.
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(()=>{ drawLines(); if(current === 'pageMore') growLines(); });
+  }
 
   document.getElementById('backFromMore').addEventListener('click', ()=> goTo('pageHome', window.innerWidth/2));
   document.getElementById('footerLogoMore').addEventListener('click', ()=> goTo('pageHome', window.innerWidth/2));
@@ -749,12 +764,18 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     to.classList.add('revealing');
     if(target === 'pageMore'){
       to.classList.remove('stage-1','stage-2','stage-3');
-      // stage 1: the illustration appears first
-      setTimeout(()=>{ to.classList.add('stage-1'); drawLines(); }, 60);
-      // stage 2: the leader lines + labels appear
-      setTimeout(()=>{ to.classList.add('stage-2'); growLines(); }, 620);
+      // stage 1: the illustration appears first (this also kicks off its
+      // scale(0.92)->scale(1) transition, so anything measuring the art's
+      // layout has to wait until that settles — see stage 2 below)
+      setTimeout(()=>{ to.classList.add('stage-1'); }, 60);
+      // stage 2: the leader lines + labels appear. drawLines() measures
+      // each label's real on-screen box, so it must run AFTER the art's
+      // scale-in transition (started at 60ms, 620ms long) has finished —
+      // measuring mid-transition bakes in stale, shrunk coordinates that
+      // never correct themselves afterward.
+      setTimeout(()=>{ to.classList.add('stage-2'); drawLines(); growLines(); }, 720);
       // stage 3: top traits + bottom logo fade in
-      setTimeout(()=>{ to.classList.add('stage-3'); }, 1000);
+      setTimeout(()=>{ to.classList.add('stage-3'); }, 1080);
     }
     if(target === 'pageContact'){
       to.classList.remove('stage-1','stage-2','stage-3');
