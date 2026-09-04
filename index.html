@@ -129,7 +129,7 @@
     transition:opacity 520ms ease, transform 520ms ease; }
   #pageContact.stage-1 .contact-sheep{ opacity:1; transform:scale(1); }
   #sheepSync{ left:4vw; bottom:9vh; width:min(20vw,270px); }
-  #sheepEnquiries{ left:37vw; top:20vh; width:min(24vw,330px); }
+  #sheepEnquiries{ left:37vw; top:27vh; width:min(24vw,330px); }
   #sheepBooking{ right:1vw; bottom:15vh; width:min(22vw,290px); }
   .contact-sheep img{ width:100%; height:auto; display:block; transition:transform 320ms ease, filter 320ms ease; }
   .contact-sheep-link{ display:block; pointer-events:auto; cursor:pointer; }
@@ -440,7 +440,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     if(!wrap) return;
     const rect = wrap.getBoundingClientRect();
     const svg = document.getElementById('lines');
-    const anchors = { 0:[59,47], 1:[80,28], 2:[35,63], 3:[49,87], 4:[93,89] };
+    const anchors = { 0:[59,47], 1:[80,28], 2:[35,63], 3:[37,76], 4:[90,79] };
     const tagEls = Array.from(document.querySelectorAll('#pageMore .tag'));
     svg.innerHTML = '';
     svg.setAttribute('width', rect.width);
@@ -456,7 +456,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       const tr = tag.getBoundingClientRect();
       const tLeft = tr.left - rect.left, tRight = tr.right - rect.left;
       const tTop = tr.top - rect.top, tBottom = tr.bottom - rect.top;
-      const pad = 5;
+      const pad = -1;
       const labelX = Math.min(Math.max(anchorX, tLeft - pad), tRight + pad);
       const labelY = Math.min(Math.max(anchorY, tTop - pad), tBottom + pad);
       // bent connector: diagonal segment near the label, then a short
@@ -781,10 +781,13 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       to.classList.remove('stage-1','stage-2','stage-3');
       // stage 1: the sheep appear
       setTimeout(()=>{ to.classList.add('stage-1'); }, 60);
-      // stage 2: leader lines + labels draw on
-      setTimeout(()=>{ to.classList.add('stage-2'); drawContactLines(); }, 520);
+      // stage 2: leader lines + labels draw on. drawContactLines() measures
+      // real on-screen positions, so it needs the sheep's scale-in
+      // transition (kicked off at 60ms, 520ms long) to be fully settled —
+      // same fix as the MORE page.
+      setTimeout(()=>{ to.classList.add('stage-2'); drawContactLines(); }, 620);
       // stage 3: top traits fade in
-      setTimeout(()=>{ to.classList.add('stage-3'); }, 900);
+      setTimeout(()=>{ to.classList.add('stage-3'); }, 960);
     }
 
     // force layout so the browser registers the starting clip before animating
