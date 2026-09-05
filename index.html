@@ -241,7 +241,7 @@
     display:flex; flex-direction:column; gap:12px; opacity:0; transition:opacity 700ms ease; }
   .mobile-legend.on{ opacity:1; }
   .mobile-legend-row{ display:flex; align-items:center; gap:10px; }
-  .mobile-legend-swatch{ width:20px; height:6px; display:block; flex-shrink:0; }
+  .mobile-legend-swatch{ width:10px; height:10px; display:block; flex-shrink:0; }
   .mobile-legend-swatch.blue{ background:var(--blue); }
   .mobile-legend-swatch.yellow{ background:var(--yellow); }
   .mobile-legend-swatch.white-t{ background:var(--white); }
@@ -915,8 +915,8 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       setTimeout(()=> legend.classList.add('on'), 6000);
     })();
 
-    // ---------- MORE / CONTACT: traits moved to the bottom ----------
-    ['pageMore','pageContact'].forEach(id=>{
+    // ---------- MORE / CONTACT / MUSIC: traits moved to the bottom ----------
+    ['pageMore','pageContact','pageMusic'].forEach(id=>{
       const traits = document.querySelector('#'+id+' .traits-top');
       if(traits) traits.classList.add('traits-bottom-mobile');
     });
@@ -1018,6 +1018,14 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
         }
       });
       window.addEventListener('resize', ()=>{ if(shiftedTile) positionMobile(shiftedTile); });
+      // the icon column is positioned in viewport coordinates but the tile
+      // list scrolls inside its own container (.music-row) on mobile — without
+      // this, scrolling leaves the icons stranded over whatever tile now sits
+      // at their old fixed position instead of following the tile they belong to
+      const musicRowEl = document.querySelector('#pageMusic .music-row');
+      if(musicRowEl){
+        musicRowEl.addEventListener('scroll', ()=>{ if(shiftedTile) positionMobile(shiftedTile); });
+      }
 
       // fold this into the same close-on-leave hook the desktop icon
       // panel already exposes, so leaving MUSIC clears the shifted tile too
