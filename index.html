@@ -136,6 +136,26 @@
   #pageContact.stage-1 #sheepSync,
   #pageContact.stage-1 #sheepEnquiries,
   #pageContact.stage-1 #sheepBooking{ opacity:1; transform:translate(0,0) scale(1); }
+
+  /* mobile: show only each sheep's head, not the full running body — the
+     asset itself is untouched, each sheep is cropped down to a small
+     overflow-hidden window and the (unresized) image is shifted inside it
+     so the head lands in frame. Positions are pushed toward the same
+     screen edge each sheep was already cropped by. */
+  body.is-mobile .contact-sheep{ overflow:hidden; }
+  body.is-mobile .contact-sheep-link{ position:relative; display:block; width:100%; height:100%; }
+  body.is-mobile .contact-sheep img{ position:absolute; top:0; width:auto; max-width:none; }
+
+  body.is-mobile #sheepSync{ left:calc(-1 * min(9vw,35px)); bottom:16vh;
+    width:min(25.6vw,99px); height:min(18.6vw,72px); }
+  body.is-mobile #sheepSync img{ width:min(72vw,280px); left:calc(-1 * min(46.4vw,181px)); }
+
+  body.is-mobile #sheepEnquiries{ left:38vw; top:20vh; width:min(28.1vw,109px); height:min(24.4vw,95px); }
+  body.is-mobile #sheepEnquiries img{ width:min(85vw,330px); left:calc(-1 * min(56.9vw,221px)); }
+
+  body.is-mobile #sheepBooking{ right:calc(-1 * min(8vw,32px)); bottom:22vh;
+    width:min(23.2vw,90px); height:min(24.4vw,95px); }
+  body.is-mobile #sheepBooking img{ width:min(77vw,300px); left:calc(-1 * min(53.8vw,210px)); }
   .contact-sheep img{ width:100%; height:auto; display:block; transition:transform 320ms ease, filter 320ms ease; }
   .contact-sheep-link{ display:block; pointer-events:auto; cursor:pointer; }
   .contact-sheep-link:hover img, .contact-sheep-link.paired-hover img{ transform:scale(1.035); filter:brightness(1.4); }
@@ -688,7 +708,15 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     svg.setAttribute('width', rect.width);
     svg.setAttribute('height', rect.height);
     svg.innerHTML = '';
-    const items = [
+    // ax/ay locate the nose within the sheep's own (unclipped) image box —
+    // on mobile that box is the same asset, just windowed down to the head,
+    // so the nose sits at a different fraction of the full image than on
+    // desktop's full-body view.
+    const items = isTouch ? [
+      {imgSel:'#sheepSync img', tagSel:'#tagSync', ax:96.5, ay:19},
+      {imgSel:'#sheepEnquiries img', tagSel:'#tagEnquiries', ax:96.8, ay:30},
+      {imgSel:'#sheepBooking img', tagSel:'#tagBooking', ax:96.7, ay:41}
+    ] : [
       {imgSel:'#sheepSync img', tagSel:'#tagSync', ax:49, ay:46},
       {imgSel:'#sheepEnquiries img', tagSel:'#tagEnquiries', ax:49, ay:50},
       {imgSel:'#sheepBooking img', tagSel:'#tagBooking', ax:39, ay:34}
