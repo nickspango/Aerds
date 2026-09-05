@@ -551,8 +551,17 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
   // drawLines() first measures it (60ms into the reveal) — once it swaps
   // in, box widths shift and the old line endpoints go stale. Redraw once
   // fonts are confirmed ready to snap every line back onto its label.
+  // same font-swap risk applies to the top-traits labels (initTopTraits'
+  // layout()) and to CONTACT's leader lines (drawContactLines) — both
+  // measure real text/box widths too, so they get the same fonts.ready
+  // correction as drawLines() above rather than each inventing its own.
+  const topTraitsLayouts = [];
   if(document.fonts && document.fonts.ready){
-    document.fonts.ready.then(()=>{ drawLines(); if(current === 'pageMore') growLines(); });
+    document.fonts.ready.then(()=>{
+      drawLines(); if(current === 'pageMore') growLines();
+      topTraitsLayouts.forEach(fn=>fn());
+      if(current === 'pageContact') drawContactLines();
+    });
   }
 
   document.getElementById('backFromMore').addEventListener('click', ()=> goTo('pageHome', window.innerWidth/2));
@@ -629,6 +638,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     }
     window.addEventListener('resize', layout);
     setTimeout(layout, 60);
+    topTraitsLayouts.push(layout);
 
     rigs.forEach(rig=>{
       const tint = document.getElementById('footerLogoTint');
@@ -785,6 +795,13 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
         activeTile = null;
       }
     });
+
+    // exposed so goTo() can close any open icon panel when leaving MUSIC —
+    // otherwise a tile left open stays open, ghost-visible, on the next visit
+    window.__closeMusicUI = function(){
+      iconsRow.classList.remove('on');
+      activeTile = null;
+    };
   })();
 
   // --- page transition: wipe covers screen, swaps page, wipe reveals ---
@@ -807,6 +824,16 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     homeNavTimer = setTimeout(()=>{ homeNav.classList.add('on'); }, 2000);
   }
 
+  // stage-timeout ids for the currently in-flight MORE/CONTACT arrival
+  // sequence. If the user navigates away before a sequence finishes, its
+  // remaining timeouts are cancelled here instead of being left to fire
+  // later against a page that's no longer current (they'd still be
+  // harmless today since the next real visit resets stage classes anyway,
+  // but they do stale, wasted re-measurement/redraw work in the meantime —
+  // and if a return visit happens to land inside their window, that stale
+  // redraw can visibly double up on top of the new, correct one).
+  let pendingSeqTimers = [];
+
   function goTo(target, originXpx){
     if(target === current) return;
     const originPct = typeof originXpx === 'number'
@@ -816,6 +843,13 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     const from = document.getElementById(current);
     const to = document.getElementById(target);
     scheduleHomeNav(target);
+
+    pendingSeqTimers.forEach(clearTimeout);
+    pendingSeqTimers = [];
+
+    // leaving MUSIC: close any open streaming-icon panel so it doesn't
+    // reappear, already open, next time the page is shown
+    if(current === 'pageMusic' && window.__closeMusicUI) window.__closeMusicUI();
 
     // destination page starts collapsed to a 0-width line at the trait's x,
     // then expands outward in both directions to reveal itself directly —
@@ -828,27 +862,28 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       // stage 1: the illustration appears first (this also kicks off its
       // scale(0.92)->scale(1) transition, so anything measuring the art's
       // layout has to wait until that settles — see stage 2 below)
-      setTimeout(()=>{ to.classList.add('stage-1'); }, 60);
+      pendingSeqTimers.push(setTimeout(()=>{ to.classList.add('stage-1'); }, 60));
       // stage 2: the leader lines + labels appear. drawLines() measures
       // each label's real on-screen box, so it must run AFTER the art's
       // scale-in transition (started at 60ms, 620ms long) has finished —
       // measuring mid-transition bakes in stale, shrunk coordinates that
       // never correct themselves afterward.
-      setTimeout(()=>{ to.classList.add('stage-2'); drawLines(); growLines(); if(isTouch) drawMobileMoreLines(); }, 720);
+      pendingSeqTimers.push(setTimeout(()=>{ to.classList.add('stage-2'); drawLines(); growLines(); if(isTouch) drawMobileMoreLines(); }, 720));
       // stage 3: top traits + bottom logo fade in
-      setTimeout(()=>{ to.classList.add('stage-3'); }, 1080);
+      pendingSeqTimers.push(setTimeout(()=>{ to.classList.add('stage-3'); }, 1080));
     }
     if(target === 'pageContact'){
       to.classList.remove('stage-1','stage-2','stage-3');
       // stage 1: the sheep appear
-      setTimeout(()=>{ to.classList.add('stage-1'); }, 60);
+      pendingSeqTimers.push(setTimeout(()=>{ to.classList.add('stage-1'); }, 60));
       // stage 2: leader lines + labels draw on. drawContactLines() measures
-      // real on-screen positions, so it needs the sheep's scale-in
-      // transition (kicked off at 60ms, 520ms long) to be fully settled —
-      // same fix as the MORE page.
-      setTimeout(()=>{ to.classList.add('stage-2'); drawContactLines(); }, 620);
+      // real on-screen positions, so it needs the sheep's entrance
+      // transition (kicked off at 60ms, 620ms long) to be fully settled —
+      // same fix as the MORE page. (bumped from 620 to 680 to stay after
+      // the entrance transition once its length grew from 520 to 620ms)
+      pendingSeqTimers.push(setTimeout(()=>{ to.classList.add('stage-2'); drawContactLines(); }, 680));
       // stage 3: top traits fade in
-      setTimeout(()=>{ to.classList.add('stage-3'); }, 960);
+      pendingSeqTimers.push(setTimeout(()=>{ to.classList.add('stage-3'); }, 960));
     }
 
     // force layout so the browser registers the starting clip before animating
@@ -925,7 +960,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
         } else {
           const el = document.createElement('a');
           el.className = 'mi-icon-link';
-          el.href = href; if(target) el.target = target;
+          el.href = href; if(target){ el.target = target; el.rel = 'noopener'; }
           el.innerHTML = MI_ICONS[label] || '';
           el.style.left = '96%';
           el.style.top = ay + '%';
@@ -983,6 +1018,14 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
         }
       });
       window.addEventListener('resize', ()=>{ if(shiftedTile) positionMobile(shiftedTile); });
+
+      // fold this into the same close-on-leave hook the desktop icon
+      // panel already exposes, so leaving MUSIC clears the shifted tile too
+      const prevCloseMusicUI = window.__closeMusicUI;
+      window.__closeMusicUI = function(){
+        if(prevCloseMusicUI) prevCloseMusicUI();
+        if(shiftedTile){ shiftedTile.classList.remove('tile-shifted'); shiftedTile = null; }
+      };
     })();
   }
 })();
