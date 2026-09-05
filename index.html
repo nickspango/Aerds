@@ -146,16 +146,38 @@
   body.is-mobile .contact-sheep-link{ position:relative; display:block; width:100%; height:100%; }
   body.is-mobile .contact-sheep img{ position:absolute; top:0; width:auto; max-width:none; }
 
-  body.is-mobile #sheepSync{ left:calc(-1 * min(9vw,35px)); bottom:16vh;
-    width:min(25.6vw,99px); height:min(18.6vw,72px); }
+  /* on mobile the three heads take a different screen slot than desktop's
+     full-body layout — ENQUIRIES top-left (cropped left), SYNC middle-right
+     (cropped right), BOOKING bottom-left (cropped left) — so position AND
+     entrance direction are reassigned per slot; the crop window itself
+     (width/height/img shift below) stays tied to each sheep's own asset */
+  body.is-mobile #sheepEnquiries{ left:calc(-1 * min(9.9vw,39px)); top:12vh; bottom:auto;
+    transform:translateX(-14vw) scale(0.94); }
+  body.is-mobile #sheepSync{ right:calc(-1 * min(8.8vw,35px)); left:auto; top:42vh; bottom:auto;
+    transform:translateX(14vw) scale(0.96); }
+  body.is-mobile #sheepBooking{ left:calc(-1 * min(8.2vw,32px)); right:auto; bottom:16vh; top:auto;
+    transform:translateX(-14vw) scale(0.96); }
+
+  body.is-mobile #sheepSync{ width:min(25.6vw,99px); height:min(18.6vw,72px); }
   body.is-mobile #sheepSync img{ width:min(72vw,280px); left:calc(-1 * min(46.4vw,181px)); }
 
-  body.is-mobile #sheepEnquiries{ left:38vw; top:20vh; width:min(28.1vw,109px); height:min(24.4vw,95px); }
+  body.is-mobile #sheepEnquiries{ width:min(28.1vw,109px); height:min(24.4vw,95px); }
   body.is-mobile #sheepEnquiries img{ width:min(85vw,330px); left:calc(-1 * min(56.9vw,221px)); }
 
-  body.is-mobile #sheepBooking{ right:calc(-1 * min(8vw,32px)); bottom:22vh;
-    width:min(23.2vw,90px); height:min(24.4vw,95px); }
+  body.is-mobile #sheepBooking{ width:min(23.2vw,90px); height:min(24.4vw,95px); }
   body.is-mobile #sheepBooking img{ width:min(77vw,300px); left:calc(-1 * min(53.8vw,210px)); }
+
+  /* mobile label positions follow the reassigned slots above (label sits on
+     the side opposite the sheep, matching the reference) */
+  body.is-mobile #tagEnquiries{ left:40%; top:18.6vh; }
+  body.is-mobile #tagSync{ left:6%; right:auto; top:47vh; }
+  body.is-mobile #tagBooking{ left:38%; right:auto; top:77.8vh; }
+
+  /* mobile page title — centered text at the top, indicative only */
+  .mobile-page-title{ position:absolute; left:0; right:0;
+    top:calc(min(6vw,28px) + env(safe-area-inset-top, 0px));
+    text-align:center; font-weight:900; font-size:13px; letter-spacing:0.04em;
+    color:var(--white); pointer-events:none; z-index:5; }
   .contact-sheep img{ width:100%; height:auto; display:block; transition:transform 320ms ease, filter 320ms ease; }
   .contact-sheep-link{ display:block; pointer-events:auto; cursor:pointer; }
   .contact-sheep-link:hover img, .contact-sheep-link.paired-hover img{ transform:scale(1.035); filter:brightness(1.4); }
@@ -729,8 +751,14 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       const tr = tag.getBoundingClientRect();
       const anchorX = ir.left - rect.left + ir.width * (item.ax/100);
       const anchorY = ir.top - rect.top + ir.height * (item.ay/100);
-      const tagX = tr.left - rect.left + tr.width/2;
-      const tagY = tr.bottom - rect.top + 6;
+      // on mobile the line runs horizontally at nose height, starting from
+      // whichever side of the label text faces the sheep — not from below
+      // the text like the desktop's diagonal "hanging label" style
+      const tagCenterX = tr.left - rect.left + tr.width/2;
+      const tagX = isTouch
+        ? (anchorX < tagCenterX ? tr.left - rect.left - 8 : tr.right - rect.left + 8)
+        : tagCenterX;
+      const tagY = isTouch ? (tr.top - rect.top + tr.height/2) : (tr.bottom - rect.top + 6);
       // bent connector: diagonal segment near the label, then a short
       // horizontal segment approaching the anchor point (same language as MORE)
       // on mobile, lines are straight (no bend) — illegible on a small screen
@@ -948,6 +976,15 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       const traits = document.querySelector('#'+id+' .traits-top');
       if(traits) traits.classList.add('traits-bottom-mobile');
     });
+
+    // ---------- CONTACT: page title ----------
+    (function(){
+      const title = document.createElement('div');
+      title.className = 'mobile-page-title';
+      title.textContent = 'CONTACT';
+      const page = document.getElementById('pageContact');
+      if(page) page.appendChild(title);
+    })();
 
     // ---------- MORE: icon links + straight leader lines ----------
     const moreAnchors = { 0:[59,47], 1:[80,28], 2:[35,63], 3:[37,76], 4:[90,79] };
