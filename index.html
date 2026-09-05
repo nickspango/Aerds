@@ -125,12 +125,17 @@
   #pageContact{ background:var(--black); }
   #pageContact .traits-top{ opacity:0; transition:opacity 480ms ease; }
   #pageContact.stage-3 .traits-top{ opacity:1; }
-  .contact-sheep{ position:absolute; pointer-events:none; opacity:0; transform:scale(0.94);
-    transition:opacity 520ms ease, transform 520ms ease; }
-  #pageContact.stage-1 .contact-sheep{ opacity:1; transform:scale(1); }
-  #sheepSync{ left:4vw; bottom:9vh; width:min(20vw,270px); }
-  #sheepEnquiries{ left:37vw; top:27vh; width:min(24vw,330px); }
-  #sheepBooking{ right:1vw; bottom:15vh; width:min(22vw,290px); }
+  /* sheep cropped by the screen edges get an entrance that reads as
+     "running into frame" — sliding in from beyond the edge they're cut by,
+     rather than a plain scale/fade */
+  .contact-sheep{ position:absolute; pointer-events:none; opacity:0;
+    transition:opacity 620ms ease, transform 620ms cubic-bezier(.2,.8,.2,1); }
+  #sheepSync{ left:4vw; bottom:9vh; width:min(20vw,270px); transform:translateX(-14vw) scale(0.96); }
+  #sheepEnquiries{ left:37vw; top:27vh; width:min(24vw,330px); transform:translateY(-24px) scale(0.94); }
+  #sheepBooking{ right:1vw; bottom:15vh; width:min(22vw,290px); transform:translateX(14vw) scale(0.96); }
+  #pageContact.stage-1 #sheepSync,
+  #pageContact.stage-1 #sheepEnquiries,
+  #pageContact.stage-1 #sheepBooking{ opacity:1; transform:translate(0,0) scale(1); }
   .contact-sheep img{ width:100%; height:auto; display:block; transition:transform 320ms ease, filter 320ms ease; }
   .contact-sheep-link{ display:block; pointer-events:auto; cursor:pointer; }
   .contact-sheep-link:hover img, .contact-sheep-link.paired-hover img{ transform:scale(1.035); filter:brightness(1.4); }
@@ -872,7 +877,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
           legend.appendChild(row);
         });
       document.getElementById('pageHome').appendChild(legend);
-      setTimeout(()=> legend.classList.add('on'), 5500);
+      setTimeout(()=> legend.classList.add('on'), 6000);
     })();
 
     // ---------- MORE / CONTACT: traits moved to the bottom ----------
