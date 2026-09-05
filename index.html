@@ -154,9 +154,14 @@
   body.is-mobile #sheepEnquiries{ left:calc(-1 * min(9.9vw,39px)); top:12vh; bottom:auto;
     transform:translateX(-14vw) scale(0.94); }
   body.is-mobile #sheepSync{ right:calc(-1 * min(8.8vw,35px)); left:auto; top:42vh; bottom:auto;
-    transform:translateX(14vw) scale(0.96); }
+    transform:translateX(14vw) scale(0.96) scaleX(-1); }
   body.is-mobile #sheepBooking{ left:calc(-1 * min(8.2vw,32px)); right:auto; bottom:16vh; top:auto;
     transform:translateX(-14vw) scale(0.96); }
+  /* SYNC/LICENSING sits on the right and should look back toward its label
+     on the left, like the other two look toward theirs — mirror the whole
+     cropped window (not the underlying image) so the existing crop/anchor
+     geometry above stays correct, just flipped */
+  body.is-mobile #pageContact.stage-1 #sheepSync{ transform:scaleX(-1); }
 
   body.is-mobile #sheepSync{ width:min(25.6vw,99px); height:min(18.6vw,72px); }
   body.is-mobile #sheepSync img{ width:min(72vw,280px); left:calc(-1 * min(46.4vw,181px)); }
@@ -262,7 +267,10 @@
     font-size:clamp(16px,2vw,28px); letter-spacing:0.02em; color:var(--black); transition:opacity 200ms ease; }
   .music-icons{ position:absolute; display:flex; gap:9px; opacity:0; pointer-events:none;
     transform:translate(-50%,-28px);
-    transition:opacity 220ms ease, transform 380ms cubic-bezier(.2,.9,.25,1); z-index:5; }
+    /* must sit above .music-row (z-index:10) — on mobile that row is
+       pointer-events:auto and covers the full page for scrolling, so at
+       z-index:5 it silently intercepted every tap meant for these icons */
+    transition:opacity 220ms ease, transform 380ms cubic-bezier(.2,.9,.25,1); z-index:15; }
   .music-icons.on{ opacity:1; pointer-events:auto; transform:translate(-50%,0); }
   .music-icons a{ width:min(2.6vw,22px); height:min(2.6vw,22px); min-width:17px; min-height:17px;
     display:flex; align-items:center; justify-content:center; transition:transform 160ms ease, opacity 160ms ease; opacity:0.85; }
@@ -288,6 +296,16 @@
   .mobile-legend-swatch.yellow{ background:var(--yellow); }
   .mobile-legend-swatch.white-t{ background:var(--white); }
   .mobile-legend-label{ font-weight:900; font-size:12px; letter-spacing:0.04em; color:var(--white); }
+
+  /* mobile nav bars read as actual buttons — wider and thicker, with
+     rounded ends — rather than the thin decorative underline used on
+     desktop where a mouse hovers/clicks a whole trait, not just the bar */
+  body.is-mobile .traits-top .bar{ height:12px; width:min(15vw,150px); border-radius:6px; }
+
+  /* home button moves to bottom-right on mobile, within easy thumb reach,
+     instead of desktop's top-right corner */
+  body.is-mobile .home-nav{ top:auto;
+    bottom:calc(min(3vw,26px) + env(safe-area-inset-bottom, 0px)); }
 
   /* MORE / CONTACT: traits moved to the bottom (thumb reach) */
   .traits-top.traits-bottom-mobile{ top:auto; bottom:calc(min(5vw,32px) + env(safe-area-inset-bottom, 0px)); }
