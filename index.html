@@ -325,9 +325,9 @@
 
   /* MORE / CONTACT: traits moved to the bottom (thumb reach) */
   .traits-top.traits-bottom-mobile{ top:auto; bottom:calc(min(5vw,32px) + env(safe-area-inset-bottom, 0px)); }
-  /* CONTACT also has the social-icons row near the bottom — give the traits
-     more clearance so the two rows don't collide */
-  #pageContact .traits-top.traits-bottom-mobile{ bottom:calc(min(15vw,72px) + env(safe-area-inset-bottom, 0px)); }
+  /* CONTACT: traits stay on the same bottom-most line as MUSIC/MORE (and thus
+     the home button, which is aligned to that same line) — the social-icons
+     row is the one raised above it, swapped from the previous order */
   /* MORE's footer "aerds" logo (tap = back home) also sits near the bottom —
      lift it clear of the traits row now living there too */
   body.is-mobile #pageMore .footer-logo{ bottom:calc(min(15vw,76px) + env(safe-area-inset-bottom, 0px)); }
@@ -346,7 +346,7 @@
 
   /* CONTACT mobile: only the text label is tappable, not the whole sheep */
   body.is-mobile #pageContact .contact-sheep-link{ pointer-events:none; }
-  body.is-mobile .contact-social{ bottom:calc(min(5vw,50px) + env(safe-area-inset-bottom, 0px)); }
+  body.is-mobile .contact-social{ bottom:calc(min(15vw,72px) + env(safe-area-inset-bottom, 0px)); }
 
   /* avoid stuck iOS hover states on tap */
   body.is-mobile .tag::after{ display:none; }
