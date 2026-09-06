@@ -168,11 +168,14 @@
      (cropped right), BOOKING bottom-left (cropped left) — so position AND
      entrance direction are reassigned per slot; the crop window itself
      (width/height/img shift below) stays tied to each sheep's own asset */
-  body.is-mobile #sheepEnquiries{ left:calc(-1 * min(9.9vw,39px)); top:12vh; bottom:auto;
+  /* TEST: tighter vertical rhythm between the three blocks (was 12/42/~69vh) */
+  body.is-mobile #sheepEnquiries{ left:calc(-1 * min(9.9vw,39px)); top:17vh; bottom:auto;
     transform:translateX(-14vw) scale(0.94); }
-  body.is-mobile #sheepSync{ right:calc(-1 * min(8.8vw,35px)); left:auto; top:42vh; bottom:auto;
+  /* TEST: nudged ~5vw closer to center so its leader line isn't so much
+     longer than ENQUIRIES/BOOKING's once all three labels share one axis */
+  body.is-mobile #sheepSync{ right:calc(5vw - min(8.8vw,35px)); left:auto; top:42vh; bottom:auto;
     transform:translateX(14vw) scale(0.96) scaleX(-1); }
-  body.is-mobile #sheepBooking{ left:calc(-1 * min(8.2vw,32px)); right:auto; bottom:16vh; top:auto;
+  body.is-mobile #sheepBooking{ left:calc(-1 * min(8.2vw,32px)); right:auto; bottom:24vh; top:auto;
     transform:translateX(-14vw) scale(0.96); }
   /* SYNC/LICENSING sits on the right and should look back toward its label
      on the left, like the other two look toward theirs — mirror the whole
@@ -188,13 +191,19 @@
     transform:rotate(6deg); transform-origin:center center; }
 
   body.is-mobile #sheepBooking{ width:min(23.2vw,90px); height:min(33.5vw,130px); }
-  body.is-mobile #sheepBooking img{ width:min(77vw,300px); left:calc(-1 * min(53.8vw,210px)); }
+  /* TEST: slight opposite-direction tilt from ENQUIRIES so the three heads
+     don't read as identical copies of each other */
+  body.is-mobile #sheepBooking img{ width:min(77vw,300px); left:calc(-1 * min(53.8vw,210px));
+    transform:rotate(-5deg); transform-origin:center center; }
 
   /* mobile label positions follow the reassigned slots above (label sits on
      the side opposite the sheep, matching the reference) */
-  body.is-mobile #tagEnquiries{ left:44%; top:18.6vh; }
-  body.is-mobile #tagSync{ left:10%; right:auto; top:47vh; }
-  body.is-mobile #tagBooking{ left:38%; right:auto; top:77.8vh; }
+  /* TEST: all three labels centered on the same vertical axis, per
+     Nicolas's request to try it out — easy to revert to the staggered
+     per-label left values if the centered look isn't kept */
+  body.is-mobile #tagEnquiries{ left:50%; top:24vh; transform:translateX(-50%); }
+  body.is-mobile #tagSync{ left:50%; right:auto; top:47vh; transform:translateX(-50%); }
+  body.is-mobile #tagBooking{ left:50%; right:auto; top:70vh; transform:translateX(-50%); }
 
   .contact-sheep img{ width:100%; height:auto; display:block; transition:transform 320ms ease, filter 320ms ease; }
   .contact-sheep-link{ display:block; pointer-events:auto; cursor:pointer; }
@@ -361,7 +370,7 @@
   }
   .more-mobile-icons{ position:absolute; inset:0; pointer-events:none; z-index:5; }
   .mobile-more-lines{ position:absolute; inset:0; overflow:visible; pointer-events:none; }
-  .mobile-more-lines polyline{ stroke:var(--white); stroke-width:1.5; }
+  .mobile-more-lines polyline{ fill:none; stroke:var(--white); stroke-width:1; opacity:0.55; }
   .mi-icon-link{ position:absolute; width:24px; height:24px; transform:translate(0,-50%);
     display:flex; align-items:center; justify-content:center; pointer-events:auto; text-decoration:none; }
   .mi-icon-link svg{ width:100%; height:100%; fill:var(--white); }
@@ -374,7 +383,17 @@
 
   /* CONTACT mobile: only the text label is tappable, not the whole sheep */
   body.is-mobile #pageContact .contact-sheep-link{ pointer-events:none; }
-  body.is-mobile .contact-social{ bottom:calc(min(15vw,72px) + env(safe-area-inset-bottom, 0px)); }
+  /* TEST: a very slow, subtle breathing scale once the entrance settles, so
+     the page doesn't read as a frozen frame when nothing is being touched.
+     Lives on the link wrapper (not the img, which already carries its own
+     static crop rotation, and not the outer window, which owns the entrance
+     transition) so it can't collide with either. */
+  @keyframes sheepBreathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.018); } }
+  body.is-mobile #pageContact.stage-1 .contact-sheep-link{
+    animation: sheepBreathe 5200ms ease-in-out infinite; }
+  body.is-mobile #pageContact.stage-1 #sheepSync .contact-sheep-link{ animation-delay: -1.7s; }
+  body.is-mobile #pageContact.stage-1 #sheepBooking .contact-sheep-link{ animation-delay: -3.4s; }
+  body.is-mobile .contact-social{ bottom:calc(min(18vw,86px) + env(safe-area-inset-bottom, 0px)); }
 
   /* avoid stuck iOS hover states on tap */
   body.is-mobile .tag::after{ display:none; }
@@ -949,7 +968,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       // ear's side and ends up far past the screen edge instead of the nose
       {imgSel:'#sheepSync img', tagSel:'#tagSync', ax:96.5, ay:19, flip:true},
       {imgSel:'#sheepEnquiries img', tagSel:'#tagEnquiries', ax:94, ay:41},
-      {imgSel:'#sheepBooking img', tagSel:'#tagBooking', ax:96.7, ay:41}
+      {imgSel:'#sheepBooking img', tagSel:'#tagBooking', ax:91, ay:38}
     ] : [
       {imgSel:'#sheepSync img', tagSel:'#tagSync', ax:49, ay:46},
       {imgSel:'#sheepEnquiries img', tagSel:'#tagEnquiries', ax:49, ay:50},
