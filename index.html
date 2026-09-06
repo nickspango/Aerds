@@ -917,7 +917,13 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     // so the nose sits at a different fraction of the full image than on
     // desktop's full-body view.
     const items = isTouch ? [
-      {imgSel:'#sheepSync img', tagSel:'#tagSync', ax:96.5, ay:19},
+      // sheepSync is mirrored (scaleX(-1) on its container, so it faces its
+      // label) — getBoundingClientRect() on its img reports the mirrored
+      // on-screen box, so the nose's own 96.5% (measured on the unmirrored
+      // source art, same as the other two sheep) has to be read from the
+      // opposite side (100-96.5) of that box, or the anchor lands on the
+      // ear's side and ends up far past the screen edge instead of the nose
+      {imgSel:'#sheepSync img', tagSel:'#tagSync', ax:96.5, ay:19, flip:true},
       {imgSel:'#sheepEnquiries img', tagSel:'#tagEnquiries', ax:96.8, ay:30},
       {imgSel:'#sheepBooking img', tagSel:'#tagBooking', ax:96.7, ay:41}
     ] : [
@@ -931,7 +937,8 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       if(!img || !tag) return;
       const ir = img.getBoundingClientRect();
       let tr = tag.getBoundingClientRect();
-      const anchorX = ir.left - rect.left + ir.width * (item.ax/100);
+      const axPct = item.flip ? (100 - item.ax) : item.ax;
+      const anchorX = ir.left - rect.left + ir.width * (axPct/100);
       const anchorY = ir.top - rect.top + ir.height * (item.ay/100);
       // on mobile, force the label's own vertical center to the nose height
       // at runtime instead of relying on a fixed "top" in vh: a vh offset
