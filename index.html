@@ -168,13 +168,13 @@
      geometry above stays correct, just flipped */
   body.is-mobile #pageContact.stage-1 #sheepSync{ transform:scaleX(-1); }
 
-  body.is-mobile #sheepSync{ width:min(25.6vw,99px); height:min(18.6vw,72px); }
+  body.is-mobile #sheepSync{ width:min(25.6vw,99px); height:min(25.9vw,100px); }
   body.is-mobile #sheepSync img{ width:min(72vw,280px); left:calc(-1 * min(46.4vw,181px)); }
 
-  body.is-mobile #sheepEnquiries{ width:min(28.1vw,109px); height:min(24.4vw,95px); }
+  body.is-mobile #sheepEnquiries{ width:min(28.1vw,109px); height:min(33.5vw,130px); }
   body.is-mobile #sheepEnquiries img{ width:min(85vw,330px); left:calc(-1 * min(56.9vw,221px)); }
 
-  body.is-mobile #sheepBooking{ width:min(23.2vw,90px); height:min(24.4vw,95px); }
+  body.is-mobile #sheepBooking{ width:min(23.2vw,90px); height:min(33.5vw,130px); }
   body.is-mobile #sheepBooking img{ width:min(77vw,300px); left:calc(-1 * min(53.8vw,210px)); }
 
   /* mobile label positions follow the reassigned slots above (label sits on
@@ -305,7 +305,7 @@
   /* mobile nav bars read as actual buttons — wider and thicker, with
      rounded ends — rather than the thin decorative underline used on
      desktop where a mouse hovers/clicks a whole trait, not just the bar */
-  body.is-mobile .traits-top .bar{ height:12px; width:min(15vw,150px); border-radius:6px; }
+  body.is-mobile .traits-top .bar{ height:12px; width:min(15vw,150px); border-radius:0; }
 
   /* home button moves to bottom-right on mobile, within easy thumb reach,
      instead of desktop's top-right corner */
@@ -364,7 +364,10 @@
   /* same inverted-wipe hover used by the .tag links on CONTACT/MORE,
      adapted to sit inline inside a paragraph instead of free-floating */
   .about-text p .about-music-link{ position:relative; display:inline-block;
-    color:inherit; cursor:pointer; isolation:isolate; padding:0 2px; margin:0 -2px; }
+    color:inherit; cursor:pointer; isolation:isolate; padding:0 2px; margin:0 -2px;
+    /* the site's display font (Satoshi, 900) and letter-spacing used by the
+       MUSIC page's own labels/tags, instead of the Inter body copy around it */
+    font-family:'Satoshi', Arial, sans-serif; font-weight:900; letter-spacing:0.02em; }
   .about-text p .about-music-link::after{
     content:''; position:absolute; inset:0; background:var(--white);
     mix-blend-mode:difference; transform-origin:100% 50%; transform:scaleX(0);
@@ -902,9 +905,18 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       const tag = document.querySelector(item.tagSel);
       if(!img || !tag) return;
       const ir = img.getBoundingClientRect();
-      const tr = tag.getBoundingClientRect();
+      let tr = tag.getBoundingClientRect();
       const anchorX = ir.left - rect.left + ir.width * (item.ax/100);
       const anchorY = ir.top - rect.top + ir.height * (item.ay/100);
+      // on mobile, force the label's own vertical center to the nose height
+      // at runtime instead of relying on a fixed "top" in vh: a vh offset
+      // hand-tuned to line up at one viewport height (e.g. an iPhone 13)
+      // drifts out of alignment on a shorter or taller screen, which is
+      // exactly why the line used to overshoot past the nose on some phones
+      if(isTouch){
+        tag.style.top = (anchorY - tr.height/2) + 'px';
+        tr = tag.getBoundingClientRect();
+      }
       // on mobile the line runs horizontally at nose height, starting from
       // whichever side of the label text faces the sheep — not from below
       // the text like the desktop's diagonal "hanging label" style
@@ -912,7 +924,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
       const tagX = isTouch
         ? (anchorX < tagCenterX ? tr.left - rect.left - 8 : tr.right - rect.left + 8)
         : tagCenterX;
-      const tagY = isTouch ? (tr.top - rect.top + tr.height/2) : (tr.bottom - rect.top + 6);
+      const tagY = isTouch ? anchorY : (tr.bottom - rect.top + 6);
       // bent connector: diagonal segment near the label, then a short
       // horizontal segment approaching the anchor point (same language as MORE)
       // on mobile, lines are straight (no bend) — illegible on a small screen
@@ -987,9 +999,28 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
           activeTile = null;
           return;
         }
+        // jumping straight from one open tile to another: replay the same
+        // "arrive from above" entrance instead of just snapping to the new
+        // spot, which is what happened when .on was already set and never
+        // got a chance to re-trigger its transition
+        const wasOpen = iconsRow.classList.contains('on');
         activeTile = tile;
-        positionIcons(tile);
-        iconsRow.classList.add('on');
+        if(wasOpen){
+          iconsRow.classList.remove('on');
+          positionIcons(tile);
+          // a synchronous reflow isn't enough to make the browser paint the
+          // "removed" state before it's added back — without an actual
+          // painted frame in between, the transition has nothing to animate
+          // from and just snaps straight to the end state. Two rAFs (the
+          // first to reach the frame after the removal was applied, the
+          // second to add .on right at its start) reliably gets that paint.
+          requestAnimationFrame(()=>{
+            requestAnimationFrame(()=>{ iconsRow.classList.add('on'); });
+          });
+        } else {
+          positionIcons(tile);
+          iconsRow.classList.add('on');
+        }
         iconsRow.querySelector('.mi-spotify').href = tile.dataset.spotify || '#';
         iconsRow.querySelector('.mi-apple').href = tile.dataset.apple || '#';
         iconsRow.querySelector('.mi-youtubemusic').href = tile.dataset.youtubemusic || '#';
