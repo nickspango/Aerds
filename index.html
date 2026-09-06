@@ -307,10 +307,21 @@
      desktop where a mouse hovers/clicks a whole trait, not just the bar */
   body.is-mobile .traits-top .bar{ height:12px; width:min(15vw,150px); border-radius:0; }
 
+  /* on a narrow portrait screen, 60vw (sized for wide desktop viewports)
+     reads as tiny and lost in the middle of a tall black canvas — scale
+     the whole home composition up so it reads as a confident centerpiece */
+  body.is-mobile .composition{ width:min(82vw, 860px); }
+  body.is-mobile .logo-row{ height:min(18.5vw,195px); }
+  body.is-mobile .trait-row{ margin-top:min(5.4vw,44px); }
+
   /* home button moves to bottom-right on mobile, within easy thumb reach,
-     instead of desktop's top-right corner */
+     instead of desktop's top-right corner — vertically centered on the same
+     line as the bottom trait bars (same base offset as .traits-bottom-mobile,
+     shifted by half the height difference between the 26px icon and the
+     12px bar so their centers land on the same horizontal line at any
+     screen size) */
   body.is-mobile .home-nav{ top:auto;
-    bottom:calc(min(3vw,26px) + env(safe-area-inset-bottom, 0px)); }
+    bottom:calc(min(5vw,32px) + env(safe-area-inset-bottom, 0px) - 7px); }
 
   /* MORE / CONTACT: traits moved to the bottom (thumb reach) */
   .traits-top.traits-bottom-mobile{ top:auto; bottom:calc(min(5vw,32px) + env(safe-area-inset-bottom, 0px)); }
