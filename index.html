@@ -353,8 +353,12 @@
 
   /* MUSIC mobile: tile shifts left, icons stack vertically to its right */
   .music-tile.tile-shifted{ transform:translateX(-46px); }
-  body.is-mobile .music-icons{ flex-direction:column; transform:translate(0,-50%); }
+  body.is-mobile .music-icons{ flex-direction:column; transform:translate(0,-50%); gap:7px; }
   body.is-mobile .music-icons.on{ transform:translate(0,-50%); }
+  /* bigger, easier-to-tap icons than the desktop hover-row size — sized to
+     stay within the album tile's own height (6 icons + 5 gaps <= tile height,
+     checked down to the smallest supported phone width) */
+  body.is-mobile .music-icons a{ width:min(7.5vw,30px); height:min(7.5vw,30px); min-width:25px; min-height:25px; }
 
   /* ---------- ABOUT (desktop only for now) ---------- */
   #pageAbout{ background:var(--black); }
