@@ -576,8 +576,17 @@
     var okM=/^\S+@\S+\.\S+$/.test(mail);
     typeBox.classList.toggle('err',!type); fm.classList.toggle('err',!okM); fg.classList.toggle('err',!msg);
     if(!type||!okM||!msg){ note.textContent=''; (!type?typeBox:!okM?fm:fg).scrollIntoView({block:'center',behavior:'smooth'}); return; }
-    note.textContent='→ ton application mail s\u2019ouvre, il ne reste qu\u2019à envoyer.';
-    location.href='mailto:contact@aerdsmusic.com?subject='+encodeURIComponent(type)+'&body='+encodeURIComponent(msg+'\n\n\u2014 '+mail);
+    var KEY='16533446-2a96-400d-a400-6f2c589763d0', btn=document.querySelector('.ct-send');
+    if(!KEY){ location.href='mailto:contact@aerdsmusic.com?subject='+encodeURIComponent(type)+'&body='+encodeURIComponent(msg+'\n\n\u2014 '+mail); return; }
+    var old=btn.textContent; btn.textContent='SENDING\u2026'; btn.disabled=true; note.textContent='';
+    fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({access_key:KEY,subject:'[aerds.com] '+type,from_name:'aerdsmusic.com',email:mail,type:type,message:msg,botcheck:''})})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(j&&j.success){ btn.textContent='SENT'; note.textContent='Message sent. Thank you.'; fm.value=''; fg.value=''; setTimeout(function(){ btn.textContent=old; btn.disabled=false; },3500); }
+      else throw new Error('fail');
+    })
+    .catch(function(){ btn.textContent=old; btn.disabled=false; note.textContent='Something went wrong. Write to contact@aerdsmusic.com'; });
   });
 })();
 
