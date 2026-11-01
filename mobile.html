@@ -1,10 +1,13 @@
 <!doctype html>
 <html lang="fr">
 <head>
+<script>try{if(/^https?:/.test(location.protocol)){var s=matchMedia('(max-width: 700px)').matches||matchMedia('(pointer: coarse) and (max-width: 1024px)').matches;if(s!==true)location.replace('/desktop/home');}}catch(e){}</script>
+<script>try{if(/^https?:/.test(location.protocol)){var s=matchMedia('(max-width: 700px)').matches||matchMedia('(pointer: coarse) and (max-width: 1024px)').matches;if(s!==true)location.replace('/desktop/home');}}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<title>Aerds</title>
+<title>Aerds — Official website</title>
+<link rel="canonical" href="https://aerdsmusic.com/mobile/home">
 <style>
   @font-face{
     font-family: 'Satoshi';
@@ -679,6 +682,32 @@
   new MutationObserver(function(){ var d=ab.classList.contains('ab-done'); if(d&&!was){ setTimeout(scr,500); loop(); } if(!d){ clearTimeout(tm); lt.textContent=TXT; } was=d; }).observe(ab,{attributes:true,attributeFilter:['class']});
 })();
 
+</script>
+<script>
+(function(){
+  if(!/^https?:/.test(location.protocol)) return;
+  var T={"home": "Aerds \u2014 Official website", "music": "Music \u2014 Aerds", "about": "About \u2014 Aerds", "bio": "Biography \u2014 Aerds", "contact": "Contact \u2014 Aerds"}, ids=["home", "music", "about", "contact"];
+  function slug(){ var m=location.pathname.match(/^\/mobile\/([a-z]+)\/?$/); return m&&ids.indexOf(m[1])>-1?m[1]:'home'; }
+  var s0=slug(), el=document.getElementById(s0);
+  history.replaceState(null,'','/mobile/'+s0); document.title=T[s0];
+  if(s0!=='home'&&el){ window.addEventListener('load',function(){ el.scrollIntoView(); }); setTimeout(function(){ el.scrollIntoView(); },60); }
+  var cur=s0, t;
+  function upd(){ var best='home',bd=1e9; ids.forEach(function(i){ var e=document.getElementById(i); if(!e) return; var d=Math.abs(e.getBoundingClientRect().top); if(d<bd){bd=d;best=i;} }); if(best!==cur){ cur=best; history.replaceState(null,'','/mobile/'+best); document.title=T[best]; } }
+  window.addEventListener('scroll',function(){ clearTimeout(t); t=setTimeout(upd,120); },{passive:true});
+})();
+</script>
+<script>
+(function(){
+  if(!/^https?:/.test(location.protocol)) return;
+  var T={"home": "Aerds \u2014 Official website", "music": "Music \u2014 Aerds", "about": "About \u2014 Aerds", "bio": "Biography \u2014 Aerds", "contact": "Contact \u2014 Aerds"}, ids=["home", "music", "about", "contact"];
+  function slug(){ var m=location.pathname.match(/^\/mobile\/([a-z]+)\/?$/); return m&&ids.indexOf(m[1])>-1?m[1]:'home'; }
+  var s0=slug(), el=document.getElementById(s0);
+  history.replaceState(null,'','/mobile/'+s0); document.title=T[s0];
+  if(s0!=='home'&&el){ window.addEventListener('load',function(){ el.scrollIntoView(); }); setTimeout(function(){ el.scrollIntoView(); },60); }
+  var cur=s0, t;
+  function upd(){ var best='home',bd=1e9; ids.forEach(function(i){ var e=document.getElementById(i); if(!e) return; var d=Math.abs(e.getBoundingClientRect().top); if(d<bd){bd=d;best=i;} }); if(best!==cur){ cur=best; history.replaceState(null,'','/mobile/'+best); document.title=T[best]; } }
+  window.addEventListener('scroll',function(){ clearTimeout(t); t=setTimeout(upd,120); },{passive:true});
+})();
 </script>
 </body>
 </html>

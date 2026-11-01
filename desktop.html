@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script>try{if(/^https?:/.test(location.protocol)){var s=matchMedia('(max-width: 700px)').matches||matchMedia('(pointer: coarse) and (max-width: 1024px)').matches;if(s!==false)location.replace('/mobile/home');}}catch(e){}</script>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -10,13 +11,13 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aerds</title>
-<meta name="description" content="Official website, music, and more.">
-<link rel="canonical" href="https://aerdsmusic.com/">
+<title>Aerds — Official website</title>
+<meta name="description" content="Aerds, French electronic music artist and composer. Official website: new single Alpes (6 November 2026), music, about and contact.">
+<link rel="canonical" href="https://aerdsmusic.com/desktop/home">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Aerds">
-<meta property="og:description" content="Official website, music, and more.">
-<meta property="og:url" content="https://aerdsmusic.com/">
+<meta property="og:title" content="Aerds — Official website">
+<meta property="og:description" content="Aerds, French electronic music artist and composer. Official website: new single Alpes (6 November 2026), music, about and contact.">
+<meta property="og:url" content="https://aerdsmusic.com/desktop/home">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <style>
@@ -833,6 +834,10 @@
   @keyframes sheepEar{ 0%,80%{transform:rotate(0)} 83%{transform:rotate(-7deg)} 86%{transform:rotate(2deg)} 89%{transform:rotate(-6deg)} 92%{transform:rotate(0)} 100%{transform:rotate(0)} }
   /* ABOUT: CONTACT trait black at rest */
   #pageMore .traits-top .bar.white-t{ background:#000; border-color:#000; }
+  /* leader lines run BEHIND the letters */
+  .mo-lines{ z-index:0 !important; }
+  .mo-stage .l{ z-index:1; }
+  .mo-tag{ z-index:2; }
 </style>
 </head>
 <body>
@@ -1760,6 +1765,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
 
     from.classList.add('hidden');
     current = target;
+    if(window.__onRoute) window.__onRoute(target);
   }
 
   // ================= MOBILE (touch / no-hover) =================
@@ -2171,11 +2177,11 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
   var pg=document.getElementById('pageMore'), st=document.getElementById('moStage'); if(!pg||!st) return;
   var NS='http://www.w3.org/2000/svg', svg=document.createElementNS(NS,'svg'); svg.setAttribute('class','mo-lines'); st.appendChild(svg);
   var cfg={
-    a:{ax:.10, ay:.27, dir:-1, big:'A', mid:' for\n', word:'Alphabetical advantage'},
-    e:{ax:.32, ay:.26, dir:-1, big:'E', mid:' for ', word:'Ears'},
-    r:{ax:.50, ay:.26, dir:-1, big:'R', mid:' for ', word:'Ears'},
-    s:{ax:.895, ay:.26, dir:1, big:'S', mid:' for ', word:'Synthesizers'},
-    d:{ax:.745, ay:0, dir:1, big:'D', mid:' for ', word:'Dévotion'} };
+    a:{ax:.10, ay:.33, dir:-1, big:'A', mid:' for\n', word:'Alphabetical advantage'},
+    e:{ax:.32, ay:.33, dir:-1, big:'E', mid:' for ', word:'Ears'},
+    r:{ax:.465, ay:.34, dir:-1, big:'R', mid:' for ', word:'Ears'},
+    s:{ax:.895, ay:.33, dir:1, big:'S', mid:' for ', word:'Synthesizers'},
+    d:{ax:.745, ay:.06, dir:1, big:'D', mid:' for ', word:'Dévotion'} };
   var items={};
   function build(k){
     var c=cfg[k], W=st.clientWidth, H=st.clientHeight, d=c.dir;
@@ -2204,6 +2210,18 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
 <script>
 (function(){ var l=document.querySelector('#sheepBooking .contact-sheep-link'), im=l&&l.querySelector('img'); if(!im) return;
   var d=document.createElement('div'); d.className='sheep-ear'; var c=document.createElement('img'); c.src=im.src; c.alt=''; d.appendChild(c); l.appendChild(d); })();
+</script>
+<script>
+(function(){
+  if(!/^https?:/.test(location.protocol)) return;
+  var R={"home": "pageHome", "music": "pageMusic", "about": "pageMore", "bio": "pageAbout", "contact": "pageContact"}, T={"home": "Aerds \u2014 Official website", "music": "Music \u2014 Aerds", "about": "About \u2014 Aerds", "bio": "Biography \u2014 Aerds", "contact": "Contact \u2014 Aerds"}, inv={}; Object.keys(R).forEach(function(k){inv[R[k]]=k;});
+  function slug(){ var m=location.pathname.match(/^\/desktop\/([a-z]+)\/?$/); return m&&R[m[1]]?m[1]:'home'; }
+  var cur=window.__cur();
+  var s0=slug(); if(R[s0]!==cur){ window.__goTo(R[s0]); }
+  history.replaceState({p:R[s0]},'','/desktop/'+s0); document.title=T[s0];
+  window.__onRoute=function(page){ var s=inv[page]; if(!s) return; if(location.pathname!=='/desktop/'+s){ history.pushState({p:page},'','/desktop/'+s); } document.title=T[s]; };
+  window.addEventListener('popstate',function(){ var s=slug(); document.title=T[s]; if(window.__cur()!==R[s]) window.__goTo(R[s],undefined,true); });
+})();
 </script>
 </body>
 </html>
