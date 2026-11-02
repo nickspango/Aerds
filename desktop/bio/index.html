@@ -104,7 +104,6 @@
   #pageMore.dim-chrome .tag,
   #pageMore.dim-chrome .lines,
   #pageMore.dim-chrome .footer-logo,
-  #pageMore.dim-chrome .mo-center,
   #pageMore.dim-chrome .mo-social,
   #pageMore.dim-chrome .traits-top .bar{
     opacity: 0 !important;
@@ -840,6 +839,14 @@
   .mo-tag{ z-index:2; }
   /* ABOUT: hovered CONTACT column is solid black (no blend dependency) */
   #pageMore .top-grow:not(.blue):not(.yellow){ background:#000 !important; mix-blend-mode:normal !important; }
+
+  /* ABOUT: hovering a top trait keeps aerds visible; letters read white inside the band (same cut-out as MUSIC) */
+  #pageMore.dim-chrome .mo-lines, #pageMore.dim-chrome .mo-tag{ opacity:0 !important; transition:opacity 120ms ease; }
+  .mo-clone{ position:absolute; pointer-events:none; }
+  .mo-clone .mo-stage{ cursor:default; }
+  .mo-clone .l{ background-color:#fff !important; transition:none !important; animation:none !important; }
+  .mo-clone .mo-more{ border-color:#fff !important; color:#fff !important; background:transparent !important; }
+  #pageMore.dim-chrome .mo-more, .mo-clone .mo-more{ opacity:0 !important; transition:opacity 150ms ease; }
 </style>
 </head>
 <body>
@@ -1215,6 +1222,8 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
     const pageEl = document.getElementById(pageId);
     const isMusic = pageId === 'pageMusic';
     const isContact = pageId === 'pageContact';
+    const isAboutMo = pageId === 'pageMore';
+    let moClone = null, moRaf = 0;
     const overlay = document.createElement('div');
     overlay.style.position = 'absolute';
     overlay.style.inset = '0';
@@ -1313,6 +1322,30 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
           sheepReveal.style.width = sr.width + 'px';
           sheepReveal.style.height = sr.height + 'px';
         }
+        if(isAboutMo){
+          if(moClone){ moClone.remove(); moClone=null; }
+          const src = pageEl.querySelector('.mo-center'), pr = pageEl.getBoundingClientRect(), cr = src.getBoundingClientRect(), br = rig.bar.getBoundingClientRect();
+          moClone = src.cloneNode(true);
+          moClone.className = 'mo-clone';
+          moClone.removeAttribute('style');
+          moClone.querySelectorAll('.mo-lines,.mo-tag').forEach(n=>n.remove());
+          const cs = moClone.querySelector('.mo-stage'); if(cs) cs.removeAttribute('id');
+          moClone.style.left = (cr.left - pr.left) + 'px'; moClone.style.top = (cr.top - pr.top) + 'px';
+          moClone.style.width = cr.width + 'px'; moClone.style.height = cr.height + 'px';
+          const rl = Array.from(src.querySelectorAll('.l')), cl = Array.from(moClone.querySelectorAll('.l'));
+          rl.forEach((l,i)=>{ const c = getComputedStyle(l); cl[i].style.opacity = c.opacity; cl[i].style.transform = c.transform; cl[i].style.filter = c.filter; });
+          const mo = src.querySelector('.mo-more'), cmo = moClone.querySelector('.mo-more');
+          if(mo && cmo){ const c = getComputedStyle(mo); cmo.style.opacity = c.opacity; }
+          moClone.style.clipPath = 'inset(-100vh ' + Math.max(0, cr.right - br.right) + 'px -100vh ' + Math.max(0, br.left - cr.left) + 'px)';
+          overlay.appendChild(moClone);
+          // keep the white cut-out in sync with the running EARS -> AERDS motion
+          cancelAnimationFrame(moRaf);
+          (function sync(){
+            if(!moClone) return;
+            for(let i=0;i<rl.length;i++){ const c = getComputedStyle(rl[i]); cl[i].style.opacity = c.opacity; cl[i].style.transform = c.transform; }
+            moRaf = requestAnimationFrame(sync);
+          })();
+        }
         pageEl.classList.add('dim-chrome');
         rig.grow.classList.add('on');
         rig.label.classList.add('on');
@@ -1332,6 +1365,7 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
         }
       }
       function leave(){
+        cancelAnimationFrame(moRaf); if(moClone){ moClone.remove(); moClone=null; }
         pageEl.classList.remove('dim-chrome');
         rig.grow.classList.remove('on');
         rig.label.classList.remove('on');
