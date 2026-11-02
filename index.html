@@ -5,6 +5,10 @@
 <title>Aerds</title>
 <meta name="description" content="Official website, music and more.">
 <link rel="canonical" href="https://aerdsmusic.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aerds">
+<meta property="og:description" content="Official website, music and more.">
+<meta property="og:url" content="https://aerdsmusic.com/">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -13,14 +17,27 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<style>html,body{margin:0;background:#000;height:100%}</style>
+<style>html,body{margin:0;background:#000;height:100%}a{color:#fff}</style>
 <script>
-  var small = matchMedia('(max-width: 700px)').matches
-           || matchMedia('(pointer: coarse) and (max-width: 1024px)').matches;
-  location.replace(small ? '/mobile/home' : '/desktop/home');
+(function(){
+  var M={"title": "Aerds", "desc": "Official website, music and more.", "url": "https://aerdsmusic.com/"};
+  var small=matchMedia('(max-width: 768px)').matches;
+  var file=small?'/mobile.html':'/desktop.html';
+  var guard='<script>(function(){var s=matchMedia("(max-width: 768px)").matches;addEventListener("resize",function(){if(matchMedia("(max-width: 768px)").matches!==s)location.reload();});})();<\/script>';
+  fetch(file).then(function(r){ if(!r.ok) throw 0; return r.text(); }).then(function(h){
+    h=h.replace(/<title>[\s\S]*?<\/title>/,function(){return '<title>'+M.title+'</title>';})
+       .replace(/<meta name="description"[^>]*>/,function(){return '<meta name="description" content="'+M.desc+'">';})
+       .replace(/<link rel="canonical"[^>]*>/,function(){return '<link rel="canonical" href="'+M.url+'">';})
+       .replace(/<meta property="og:title"[^>]*>/,function(){return '<meta property="og:title" content="'+M.title+'">';})
+       .replace(/<meta property="og:description"[^>]*>/,function(){return '<meta property="og:description" content="'+M.desc+'">';})
+       .replace(/<meta property="og:url"[^>]*>/,function(){return '<meta property="og:url" content="'+M.url+'">';});
+    var i=h.lastIndexOf('</body>'); if(i>-1) h=h.slice(0,i)+guard+h.slice(i);
+    document.open(); document.write(h); document.close();
+  }).catch(function(){ location.replace(file); });
+})();
 </script>
 </head>
 <body>
-<noscript><a href="/desktop/home" style="color:#fff">aerds</a> &middot; <a href="/desktop/music" style="color:#fff">music</a> &middot; <a href="/desktop/about" style="color:#fff">about</a> &middot; <a href="/desktop/contact" style="color:#fff">contact</a></noscript>
+<noscript><p><a href="/">Aerds</a></p><p><a href="/">Aerds</a> <a href="/music">Music | Aerds</a> <a href="/about">About | Aerds</a> <a href="/bio">Biography | Aerds</a> <a href="/contact">Contact | Aerds</a> </p></noscript>
 </body>
 </html>

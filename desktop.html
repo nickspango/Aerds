@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script>try{if(/^https?:/.test(location.protocol)){var s=matchMedia('(max-width: 700px)').matches||matchMedia('(pointer: coarse) and (max-width: 1024px)').matches;if(s!==false)location.replace('/mobile/home');}}catch(e){}</script>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -13,11 +12,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aerds</title>
 <meta name="description" content="Official website, music and more.">
-<link rel="canonical" href="https://aerdsmusic.com/desktop/home">
+<link rel="canonical" href="https://aerdsmusic.com/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Aerds">
 <meta property="og:description" content="Official website, music and more.">
-<meta property="og:url" content="https://aerdsmusic.com/desktop/home">
+<meta property="og:url" content="https://aerdsmusic.com/">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <style>
@@ -847,6 +846,8 @@
   .mo-clone .l{ background-color:#fff !important; transition:none !important; animation:none !important; }
   .mo-clone .mo-more{ border-color:#fff !important; color:#fff !important; background:transparent !important; }
   #pageMore.dim-chrome .mo-more, .mo-clone .mo-more{ opacity:0 !important; transition:opacity 150ms ease; }
+  /* LEARN MORE is there from the very start of the motion */
+  #pageMore .mo-more{ opacity:1; pointer-events:auto; }
 </style>
 </head>
 <body>
@@ -2251,11 +2252,11 @@ c-41 -18 -83 -69 -90 -109 -3 -18 -4 -282 -2 -587 4 -624 1 -598 82 -765 78
 (function(){
   if(!/^https?:/.test(location.protocol)) return;
   var R={"home": "pageHome", "music": "pageMusic", "about": "pageMore", "bio": "pageAbout", "contact": "pageContact"}, T={"home": "Aerds", "music": "Music | Aerds", "about": "About | Aerds", "bio": "Biography | Aerds", "contact": "Contact | Aerds"}, inv={}; Object.keys(R).forEach(function(k){inv[R[k]]=k;});
-  function slug(){ var m=location.pathname.match(/^\/desktop\/([a-z]+)\/?$/); return m&&R[m[1]]?m[1]:'home'; }
-  var cur=window.__cur();
-  var s0=slug(); if(R[s0]!==cur){ window.__goTo(R[s0]); }
-  history.replaceState({p:R[s0]},'','/desktop/'+s0); document.title=T[s0];
-  window.__onRoute=function(page){ var s=inv[page]; if(!s) return; if(location.pathname!=='/desktop/'+s){ history.pushState({p:page},'','/desktop/'+s); } document.title=T[s]; };
+  function slug(){ var m=location.pathname.match(/^\/(music|about|bio|contact)\/?$/); return m?m[1]:'home'; }
+  function url(s){ return s==='home'?'/':'/'+s; }
+  var s0=slug(); if(R[s0]!==window.__cur()){ window.__goTo(R[s0]); }
+  history.replaceState({p:R[s0]},'',url(s0)); document.title=T[s0];
+  window.__onRoute=function(page){ var s=inv[page]; if(!s) return; if(location.pathname!==url(s)){ history.pushState({p:page},'',url(s)); } document.title=T[s]; };
   window.addEventListener('popstate',function(){ var s=slug(); document.title=T[s]; if(window.__cur()!==R[s]) window.__goTo(R[s],undefined,true); });
 })();
 </script>

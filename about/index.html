@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>About | Aerds</title>
+<meta name="description" content="About Aerds: French electronic music artist and composer based in Paris. Ears, synthesizers and devotion.">
+<link rel="canonical" href="https://aerdsmusic.com/about">
+<meta property="og:type" content="website">
+<meta property="og:title" content="About | Aerds">
+<meta property="og:description" content="About Aerds: French electronic music artist and composer based in Paris. Ears, synthesizers and devotion.">
+<meta property="og:url" content="https://aerdsmusic.com/about">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<style>html,body{margin:0;background:#000;height:100%}a{color:#fff}</style>
+<script>
+(function(){
+  var M={"title": "About | Aerds", "desc": "About Aerds: French electronic music artist and composer based in Paris. Ears, synthesizers and devotion.", "url": "https://aerdsmusic.com/about"};
+  var small=matchMedia('(max-width: 768px)').matches;
+  var file=small?'/mobile.html':'/desktop.html';
+  var guard='<script>(function(){var s=matchMedia("(max-width: 768px)").matches;addEventListener("resize",function(){if(matchMedia("(max-width: 768px)").matches!==s)location.reload();});})();<\/script>';
+  fetch(file).then(function(r){ if(!r.ok) throw 0; return r.text(); }).then(function(h){
+    h=h.replace(/<title>[\s\S]*?<\/title>/,function(){return '<title>'+M.title+'</title>';})
+       .replace(/<meta name="description"[^>]*>/,function(){return '<meta name="description" content="'+M.desc+'">';})
+       .replace(/<link rel="canonical"[^>]*>/,function(){return '<link rel="canonical" href="'+M.url+'">';})
+       .replace(/<meta property="og:title"[^>]*>/,function(){return '<meta property="og:title" content="'+M.title+'">';})
+       .replace(/<meta property="og:description"[^>]*>/,function(){return '<meta property="og:description" content="'+M.desc+'">';})
+       .replace(/<meta property="og:url"[^>]*>/,function(){return '<meta property="og:url" content="'+M.url+'">';});
+    var i=h.lastIndexOf('</body>'); if(i>-1) h=h.slice(0,i)+guard+h.slice(i);
+    document.open(); document.write(h); document.close();
+  }).catch(function(){ location.replace(file); });
+})();
+</script>
+</head>
+<body>
+<noscript><p><a href="/">Aerds</a></p><p><a href="/">Aerds</a> <a href="/music">Music | Aerds</a> <a href="/about">About | Aerds</a> <a href="/bio">Biography | Aerds</a> <a href="/contact">Contact | Aerds</a> </p></noscript>
+</body>
+</html>
